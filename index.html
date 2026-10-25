@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWYNEX Daily Task Manager</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f5fb;color:#202944}
+header{background:#273c75;color:white;padding:24px 20px;border-radius:0 0 24px 24px}
+header p{color:#dce4ff;margin-bottom:0}
+main{max-width:650px;margin:auto;padding:18px}
+h2{font-size:21px}
+.stats{display:flex;gap:10px;margin:18px 0}
+.stat{background:white;padding:16px 10px;border-radius:14px;flex:1;text-align:center;box-shadow:0 2px 8px #0000000a}
+.stat strong{display:block;font-size:25px;color:#273c75}
+.card{background:white;padding:18px;border-radius:16px;margin:14px 0;box-shadow:0 2px 8px #0000000a}
+input,select{width:100%;padding:13px;margin:7px 0 12px;border:1px solid #d8ddeb;border-radius:9px;font-size:15px}
+button{background:#273c75;color:white;border:0;border-radius:9px;padding:12px 16px;font-size:15px;cursor:pointer}
+.task{padding:12px 0;border-bottom:1px solid #eee}
+.task:last-child{border:0}
+.task small{display:block;color:#737c91;margin-top:5px}
+.done{text-decoration:line-through;color:#8990a0}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+nav button{flex:1;min-width:90px;padding:11px 6px}
+.secondary{background:#e3e9fa;color:#273c75}
+.hidden{display:none}
+footer{text-align:center;padding:20px;color:#777;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<p>SWYNEX • DAILY PLANNER</p>
+<h1>My Daily Tasks</h1>
+<p>Plan your day. Complete your goals.</p>
+</header>
+<main>
+<nav>
+<button onclick="show('home')">Home</button>
+<button onclick="show('tasks')">My Tasks</button>
+<button onclick="show('add')">+ Add Task</button>
+<button onclick="show('profile')">Profile</button>
+</nav>
+
+<section id="home">
+<h2>Today's Overview</h2>
+<div class="stats">
+<div class="stat"><strong id="total">0</strong>Total</div>
+<div class="stat"><strong id="pending">0</strong>Pending</div>
+<div class="stat"><strong id="completed">0</strong>Done</div>
+</div>
+<div class="card">
+<h2>Welcome back! 👋</h2>
+<p>Stay organised and make today productive.</p>
+<button onclick="show('add')">Create a Task</button>
+</div>
+<h2>Recent Tasks</h2>
+<div class="card" id="recent">No tasks yet. Add your first task!</div>
+</section>
+
+<section id="tasks" class="hidden">
+<h2>My Tasks</h2>
+<div class="card" id="allTasks">No tasks yet.</div>
+</section>
+
+<section id="add" class="hidden">
+<h2>Create New Task</h2>
+<div class="card">
+<label for="taskName">Task name</label>
+<input id="taskName" placeholder="e.g. Complete assignment">
+<label for="taskDate">Due date</label>
+<input id="taskDate" type="date">
+<label for="priority">Priority</label>
+<select id="priority">
+<option>Medium</option><option>High</option><option>Low</option>
+</select>
+<button onclick="addTask()">Save Task</button>
+</div>
+</section>
+
+<section id="details" class="hidden">
+<h2>Task Details</h2>
+<div class="card" id="taskDetails">Select a task from My Tasks.</div>
+<button onclick="show('tasks')">Back to My Tasks</button>
+</section>
+
+<section id="profile" class="hidden">
+<h2>Profile</h2>
+<div class="card">
+<h3>Daily Task Manager</h3>
+<p>App: SWYNEX Task Planner</p>
+<p>Purpose: Organise daily activities, track tasks and improve productivity.</p>
+<p>Features: Task creation, due dates, priority, completion tracking and task details.</p>
+</div>
+</section>
+<footer>SWYNEX Daily Task Manager • Stay Productive</footer>
+</main>
+<script>
+let tasks=[];
+function show(id){
+document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+render();
+}
+function addTask(){
+let name=document.getElementById('taskName').value.trim();
+if(!name){alert('Please enter a task name.');return;}
+tasks.unshift({name,date:document.getElementById('taskDate').value,priority:document.getElementById('priority').value,done:false});
+document.getElementById('taskName').value='';
+document.getElementById('taskDate').value='';
+show('tasks');
+}
+function toggleTask(i){tasks[i].done=!tasks[i].done;render();}
+function openDetails(i){
+let t=tasks[i];
+document.getElementById('taskDetails').innerHTML='<h3>'+escapeText(t.name)+'</h3><p>Due date: '+(t.date||'Not set')+'</p><p>Priority: '+t.priority+'</p><p>Status: '+(t.done?'Completed':'Pending')+'</p><button onclick="toggleTask('+i+');openDetails('+i+')">'+(t.done?'Mark Pending':'Mark Completed')+'</button>';
+show('details');
+}
+function escapeText(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function render(){
+document.getElementById('total').textContent=tasks.length;
+document.getElementById('completed').textContent=tasks.filter(t=>t.done).length;
+document.getElementById('pending').textContent=tasks.filter(t=>!t.done).length;
+let html=tasks.map((t,i)=>'<div class="task"><strong class="'+(t.done?'done':'')+'">'+escapeText(t.name)+'</strong><small>Due: '+(t.date||'Not set')+' • Priority: '+t.priority+'</small><p><button onclick="openDetails('+i+')">Details</button> <button class="secondary" onclick="toggleTask('+i+')">'+(t.done?'Undo':'Complete')+'</button></p></div>').join('');
+document.getElementById('allTasks').innerHTML=html||'No tasks yet. Add your first task!';
+document.getElementById('recent').innerHTML=html?html.split('</div>').slice(0,3).join('</div>')+'</div>':'No tasks yet. Add your first task!';
+}
+render();
+</script>
+</body>
+</html>
