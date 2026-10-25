@@ -96,8 +96,7 @@ footer{text-align:center;padding:20px;color:#777;font-size:13px}
 </section>
 <footer>SWYNEX Daily Task Manager • Stay Productive</footer>
 </main>
-<script>
-let tasks=[];
+let tasks = JSON.parse(localStorage.getItem('swynexTasks') || '[]');
 function show(id){
 document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
 document.getElementById(id).classList.remove('hidden');
