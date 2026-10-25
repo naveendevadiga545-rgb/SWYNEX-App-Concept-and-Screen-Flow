@@ -96,6 +96,7 @@ footer{text-align:center;padding:20px;color:#777;font-size:13px}
 </section>
 <footer>SWYNEX Daily Task Manager • Stay Productive</footer>
 </main>
+  <script>
 let tasks = JSON.parse(localStorage.getItem('swynexTasks') || '[]');
 function show(id){
 document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
@@ -124,6 +125,7 @@ document.getElementById('pending').textContent=tasks.filter(t=>!t.done).length;
 let html=tasks.map((t,i)=>'<div class="task"><strong class="'+(t.done?'done':'')+'">'+escapeText(t.name)+'</strong><small>Due: '+(t.date||'Not set')+' • Priority: '+t.priority+'</small><p><button onclick="openDetails('+i+')">Details</button> <button class="secondary" onclick="toggleTask('+i+')">'+(t.done?'Undo':'Complete')+'</button></p></div>').join('');
 document.getElementById('allTasks').innerHTML=html||'No tasks yet. Add your first task!';
 document.getElementById('recent').innerHTML=html?html.split('</div>').slice(0,3).join('</div>')+'</div>':'No tasks yet. Add your first task!';
+  localStorage.setItem('swynexTasks', JSON.stringify(tasks));
 }
 render();
 </script>
